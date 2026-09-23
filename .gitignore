@@ -1,0 +1,33 @@
+# Секреты
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+env/
+.venv/
+
+# Базы
+*.db
+*.sqlite
+*.sqlite3
+
+# Логи
+*.log
+
+# Картинки паспортов
+passport_*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
