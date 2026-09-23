@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Паспорт — Доллания</title>
+    <link rel="icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/passport.css">
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" aria-label="Доллания — на главную">Доллания</a>
+        <details class="menu">
+            <summary class="menu-toggle" aria-label="Открыть меню">
+                <span class="menu-icon" aria-hidden="true"><span></span></span>
+            </summary>
+            <nav class="menu-list">
+                <a href="/">Главная</a>
+                <a href="/test.html">Тестовая страница</a>
+            </nav>
+        </details>
+    </div>
+</header>
+
+<main>
+    <h1>Паспорт гражданина</h1>
+
+    <div class="passport-card">
+        <div class="passport-header">
+            <h2>ПАСПОРТ</h2>
+            <p>Виртуального государства Доллания</p>
+        </div>
+
+        <table class="passport-table">
+            <tr>
+                <th>ФИО</th>
+                <td>{{ p.full_name }}</td>
+            </tr>
+            <tr>
+                <th>Дата рождения</th>
+                <td>{{ p.birth_date }}</td>
+            </tr>
+            <tr>
+                <th>UUID</th>
+                <td><code>{{ p.citizen_uuid }}</code></td>
+            </tr>
+            <tr>
+                <th>Дата выдачи</th>
+                <td>{{ p.issue_date }}</td>
+            </tr>
+            <tr>
+                <th>Страница владельца</th>
+                <td>
+                    <a href="https://vk.com/id{{ p.user_id }}">
+                        vk.com/id{{ p.user_id }}
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2024—2026 Доллания.</p>
+</footer>
+
+</body>
+</html>

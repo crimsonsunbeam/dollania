@@ -1,0 +1,5 @@
+Flask
+vk_api
+requests
+python-dotenv
+gunicorn

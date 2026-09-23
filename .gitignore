@@ -1,33 +1,34 @@
+# Виртуальное окружение
+venv/
+env/
+.venv/
+
 # Секреты
 .env
 *.env
 !.env.example
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-venv/
-env/
-.venv/
-
-# Базы
-*.db
+# База данных
+passports.db
 *.sqlite
 *.sqlite3
 
-# Логи
-*.log
-
-# Картинки паспортов
-passport_*.png
+# Python
+__pycache__/
+*.py[cod]
+*.so
+build/
+dist/
+*.egg-info/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 
-# OS
+# ОС
 .DS_Store
 Thumbs.db
+
+# Логи
+*.log

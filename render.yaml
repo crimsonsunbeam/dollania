@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: dollania
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
+    envVars:
+      - key: VK_TOKEN
+        sync: false
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: PRESIDENT_ID
+        value: "1094812154"
+      - key: GROUP_ID
+        value: "dollania"
+      - key: BASE_URL
+        sync: false
