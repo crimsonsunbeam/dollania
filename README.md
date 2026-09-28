@@ -7,7 +7,9 @@
 git clone https://github.com/crimsonsunbeam/dollania.git
 ```
 
-## Запуск
+```bash
+cd dollania
+```
 
 ```python
 python app.py
