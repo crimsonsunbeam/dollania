@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% set active = "symbols" %}
+
+{% block title %}Символика — Доллания{% endblock %}
+{% block description %}Государственные символы Доллании — флаг, герб, гимн.{% endblock %}
+
+{% block content %}
+
+	<h1>Символика Доллании</h1>
+
+	<section id="flag">
+		<h2>Флаг</h2>
+
+		<figure class="thumb thumb-right">
+			<img src="/static/img/flag.png" alt="Флаг Доллании" width="300" />
+			<figcaption>Флаг Доллании (с 16 июня 2024)</figcaption>
+		</figure>
+
+		<p>
+			Флаг Доллании представляет собой полотно с пропорциями 1/2 ширины к длине.
+			Три равнозначных горизонтальных полосы разных цветов:
+		</p>
+		<ul>
+			<li>верхняя — чёрный (HEX: <code>#000000</code>);</li>
+			<li>средняя — синий (HEX: <code>#1F1F7F</code>);</li>
+			<li>нижняя — голубой (HEX: <code>#2F53BF</code>).</li>
+		</ul>
+		<p>Флаг был принят 16 июня 2024 года. Несколько раз изменялись оттенки, но цвета оставались теми же.</p>
+	</section>{% endblock %}

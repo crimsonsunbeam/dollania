@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Паспорт — Доллания{% endblock %}
+{% block description %}Паспортная система Доллании: как получить, как проверить, что содержит.{% endblock %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/static/css/passport.css" />
+{% endblock %}
+
+{% block content %}
+
+	<h1>Паспорт гражданина Доллании</h1>
+
+	<div class="hatnote">
+		<span class="hatnote-icon">↗</span>
+		Эта страница — о паспортной системе Доллании.
+	</div>
+
+	<p class="lead">
+		Каждый гражданин Доллании может получить <b>виртуальный паспорт</b> с уникальным
+		идентификатором (UUID). Паспорт выдаётся ботом ВКонтакте и доступен
+		по прямой ссылке на этом сайте.
+	</p>
+
+	<h2>Как получить паспорт</h2>
+
+	<ol class="page-list-numbered">
+		<li>
+			Откройте <a href="https://vk.com/gim226164215" target="_blank" rel="noopener">бота в ВКонтакте</a>
+			и напишите <code>/start</code>.
+		</li>
+		<li>
+			Нажмите <b>«Паспорт»</b> → <b>«Зарегистрировать»</b>.
+		</li>
+		<li>
+			Введите <b>ФИО</b> и <b>дату рождения</b> в формате <code>ДД.ММ.ГГГГ</code>.
+		</li>
+		<li>
+			Бот выдаст <b>UUID</b> и <b>ссылку</b> на вашу страницу паспорта.
+		</li>
+	</ol>
+	
+		
+	<p class="passport-cta">
+		<a href="https://vk.com/gim226164215" target="_blank" rel="noopener" class="btn btn-primary">
+			Открыть бота в ВКонтакте
+		</a>
+	</p>
+
+	<div class="ambox ambox-notice">
+		<div class="ambox-icon">ℹ</div>
+		<div class="ambox-content">
+			<p>
+				Паспорт привязан к вашему аккаунту ВКонтакте навсегда.
+				Повторная регистрация невозможна.
+			</p>
+		</div>
+	</div>
+
+	<h2>Что содержит паспорт</h2>
+
+	<table class="wikitable">
+		<thead>
+			<tr>
+				<th>Поле</th>
+				<th>Описание</th>
+				<th>Можно изменить?</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><b>UUID</b></td>
+				<td>Уникальный идентификатор</td>
+				<td>❌ Нет</td>
+			</tr>
+			<tr>
+				<td><b>Дата выдачи</b></td>
+				<td>Дата регистрации в системе</td>
+				<td>❌ Нет</td>
+			</tr>
+			<tr>
+				<td><b>ФИО</b></td>
+				<td>Полное имя гражданина</td>
+				<td>✅ Да</td>
+			</tr>
+			<tr>
+				<td><b>Дата рождения</b></td>
+				<td>Дата рождения в формате ДД.ММ.ГГГГ</td>
+				<td>✅ Да</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<h2>Как проверить паспорт</h2>
+
+	<p>
+		Введите UUID паспорта, чтобы открыть страницу гражданина.
+	</p>
+
+	<form class="uuid-form" id="uuid-form" action="#" method="get">
+		<label for="uuid-input" class="uuid-form__label">UUID паспорта</label>
+		<div class="uuid-form__row">
+			<input
+				type="text"
+				id="uuid-input"
+				name="uuid"
+				class="uuid-form__input"
+				placeholder="4ec33b03-2ddb-4a85-8f78-6bf5ee0ad7f8"
+				pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+				autocomplete="off"
+				spellcheck="false"
+				required
+			/>
+			<button type="submit" class="uuid-form__button">Открыть</button>
+		</div>
+		<p class="uuid-form__hint">
+			Формат: <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>
+		</p>
+	</form>
+
+	<div class="ambox ambox-warning">
+		<div class="ambox-icon">⚠</div>
+		<div class="ambox-content">
+			<p>
+				Если паспорт не открывается — значит, паспорта с таким
+				UUID не существует.
+			</p>
+		</div>
+	</div>{% endblock %}

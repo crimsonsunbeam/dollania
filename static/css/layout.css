@@ -1,0 +1,212 @@
+/* ---------- Header ---------- */
+.site-header {
+	background: linear-gradient(180deg, var(--dark) 0%, var(--dark-2) 100%);
+	padding: var(--space-sm) var(--space-lg);
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	border-bottom: 1px solid var(--dark-3);
+	box-shadow: var(--shadow-sm);
+}
+
+.header-inner {
+	max-width: 1080px;
+	margin: 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-md);
+}
+
+.logo {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--logo);
+	font-family: var(--font-serif);
+	font-size: clamp(1.5rem, 3vw, 1.9rem);
+	text-decoration: none;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	border-bottom: none;
+}
+
+.logo:hover {
+	color: var(--logo);
+	border-bottom: none;
+}
+
+.logo:visited {
+	color: var(--logo);
+}
+
+/* ---------- Меню ---------- */
+.menu {
+	position: relative;
+}
+
+.menu-toggle {
+	list-style: none;
+	cursor: pointer;
+	width: 42px;
+	height: 42px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: var(--radius-sm);
+	transition: background 0.15s ease, border-color 0.15s ease;
+	user-select: none;
+}
+
+.menu-toggle::-webkit-details-marker { display: none; }
+.menu-toggle::marker { content: ""; }
+
+.menu-toggle:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.menu-icon {
+	position: relative;
+	display: block;
+	width: 20px;
+	height: 14px;
+}
+
+.menu-icon::before,
+.menu-icon::after,
+.menu-icon > span {
+	content: "";
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: #fff;
+	border-radius: 2px;
+	transition: transform 0.2s ease, top 0.2s ease, opacity 0.2s ease;
+}
+
+.menu-icon::before { top: 0; }
+.menu-icon > span  { top: 6px; }
+.menu-icon::after  { top: 12px; }
+
+.menu[open] .menu-icon::before {
+	top: 6px;
+	transform: rotate(45deg);
+}
+
+.menu[open] .menu-icon::after {
+	top: 6px;
+	transform: rotate(-45deg);
+}
+
+.menu[open] .menu-icon > span {
+	opacity: 0;
+}
+
+.menu-list {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	min-width: 220px;
+	background: var(--bg);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-lg);
+	padding: var(--space-sm) 0;
+	display: flex;
+	flex-direction: column;
+	z-index: 20;
+	animation: menu-fade 0.15s ease;
+}
+
+@keyframes menu-fade {
+	from { opacity: 0; transform: translateY(-6px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+.menu-list a {
+	display: block;
+	padding: 10px 16px;
+	color: var(--text);
+	text-decoration: none;
+	border-bottom: none;
+	font-size: 14px;
+	transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+}
+
+.menu-list a:hover {
+	background: var(--bg-accent);
+	color: var(--link-hover);
+	padding-left: 20px;
+}
+
+.menu-list a.active {
+	background: var(--bg-accent);
+	color: var(--link);
+	font-weight: 600;
+}
+
+.menu-sep {
+	border: none;
+	border-top: 1px solid var(--border-soft);
+	margin: var(--space-xs) 0;
+}
+
+/* ---------- Main ---------- */
+.site-main {
+	flex: 1;
+	width: 100%;
+	max-width: 1080px;
+	margin: 0 auto;
+	padding: var(--space-xl) var(--space-lg);
+}
+
+.site-main::after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+	background: var(--dark-3);
+	padding: var(--space-lg) var(--space-xl);
+	color: #b8bcc3;
+	font-size: 13px;
+	text-align: center;
+	border-top: 1px solid #000;
+	margin-top: var(--space-xl);
+	clear: both;
+}
+
+.site-footer p {
+	margin: 0 0 var(--space-sm);
+}
+
+.site-footer a {
+	color: #8ab4ff;
+	border-bottom: 1px solid transparent;
+}
+
+.site-footer a:hover {
+	color: #b9d1ff;
+	border-bottom-color: #b9d1ff;
+}
+
+/* ---------- Адаптив ---------- */
+@media (max-width: 760px) {
+	.site-main {
+		padding: var(--space-lg) var(--space-md);
+	}
+
+	.site-header {
+		padding: 12px 16px;
+	}
+
+	.site-footer {
+		padding: var(--space-md);
+	}
+}

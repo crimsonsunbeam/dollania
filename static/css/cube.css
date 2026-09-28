@@ -1,0 +1,78 @@
+/* ---------- Мини-куб в логотипе ---------- */
+.logo-text {
+	display: inline-block;
+}
+
+.logo-cube {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	position: relative;
+	perspective: 200px;
+	font-size: 0.6em;
+	line-height: 1;
+	vertical-align: middle;
+	transform: translateY(-0.05em);
+}
+
+.logo-cube__scene {
+	display: block;
+	width: 100%;
+	height: 100%;
+	perspective: 200px;
+}
+
+.logo-cube__inner {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	transform-style: preserve-3d;
+	animation: logo-cube-rotate 8s infinite linear;
+}
+
+.logo-cube__face {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	box-shadow: 0 0 6px rgba(79, 167, 168, 0.6) inset;
+	opacity: 0.95;
+}
+
+.logo-cube__face--front  {
+	background: linear-gradient(135deg, #2F53BF, #1F1F7F);
+	transform: translateZ(calc(0.5em));
+}
+.logo-cube__face--back   {
+	background: linear-gradient(135deg, #4fa7a8, #2F53BF);
+	transform: rotateY(180deg) translateZ(calc(0.5em));
+}
+.logo-cube__face--right  {
+	background: linear-gradient(135deg, #2F53BF, #4fa7a8);
+	transform: rotateY(90deg) translateZ(calc(0.5em));
+}
+.logo-cube__face--left   {
+	background: linear-gradient(135deg, #1F1F7F, #2F53BF);
+	transform: rotateY(-90deg) translateZ(calc(0.5em));
+}
+.logo-cube__face--top    {
+	background: linear-gradient(135deg, #4fa7a8, #1F1F7F);
+	transform: rotateX(90deg) translateZ(calc(0.5em));
+}
+.logo-cube__face--bottom {
+	background: linear-gradient(135deg, #2F53BF, #1F1F7F);
+	transform: rotateX(-90deg) translateZ(calc(0.5em));
+}
+
+@keyframes logo-cube-rotate {
+	0%   { transform: rotateX(0deg) rotateY(0deg); }
+	100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.logo-cube__inner {
+		animation: none;
+	}
+}

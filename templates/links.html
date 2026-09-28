@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% set active = "links" %}
+
+{% block title %}Ссылки — Республика Доллания{% endblock %}
+{% block description %}Официальные ссылки Доллании: ВКонтакте, сайт, основатель.{% endblock %}
+
+{% block content %}
+
+	<nav aria-label="Хлебные крошки">
+		<ol class="breadcrumbs">
+			<li><a href="/">Главная</a></li>
+			<li aria-current="page">Ссылки</li>
+		</ol>
+	</nav>
+
+	<h1>Ссылки</h1>
+
+	<section id="official">
+		<h2>Официальные ресурсы</h2>
+		<ul class="link-list">
+			<li><a href="https://vk.com/dollania">Официальная страница ВКонтакте</a></li>
+			<li><a href="https://vk.com/gim226164215">Бот регистрации граждан</a></li>
+			<li><a href="https://vk.com/dosfun">Страница основателя</a></li>
+			<li><a href="https://dollania.run.place">Официальный сайт</a></li>
+		</ul>
+	</section>
+
+	<section id="see-also">
+		<h2>См. также</h2>
+		<ul class="link-list">
+			<li><a href="https://ru.wikipedia.org/wiki/Виртуальное_государство">Виртуальное государство</a> — Википедия</li>
+		</ul>
+	</section>
+
+{% endblock %}

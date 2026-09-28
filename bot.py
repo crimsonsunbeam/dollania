@@ -93,6 +93,12 @@ def run_bot():
         kb.add_button("Назад", color=VkKeyboardColor.NEGATIVE)
         return kb
 
+    def unknown_kb():
+        """Клавиатура с кнопкой возврата в меню."""
+        kb = VkKeyboard(one_time=False)
+        kb.add_button("В меню", color=VkKeyboardColor.PRIMARY)
+        return kb
+
     def format_passport(p):
         url = f"{BASE_URL}/passport/{p['citizen_uuid']}"
         return (
@@ -104,6 +110,12 @@ def run_bot():
             f"Открыть паспорт на сайте:\n{url}"
         )
 
+    def unknown(peer_id):
+        send(peer_id,
+             "Неизвестный запрос.\n\n"
+             "Используйте кнопки меню или напишите /start.",
+             unknown_kb())
+
     def handle(event):
         uid = event.user_id
         text = (event.text or "").strip()
@@ -112,6 +124,13 @@ def run_bot():
 
         p = get_passport(uid)
 
+        # --- Кнопка «В меню» (для возврата после «Неизвестного запроса») ---
+        if text == "В меню":
+            states.pop(uid, None)
+            send(peer_id, "Главное меню:", main_kb())
+            return
+
+        # --- Команды ---
         if text in ("/start", "Начать", "начать", "Start"):
             states.pop(uid, None)
             send(peer_id,
@@ -190,8 +209,11 @@ def run_bot():
             send(peer_id, "Главное меню:", main_kb())
             return
 
+        # --- FSM ---
         st = states.get(uid)
         if not st:
+            # Пользователь не в процессе — неизвестный запрос
+            unknown(peer_id)
             return
 
         # --- president ---
@@ -341,6 +363,9 @@ def run_bot():
                      passport_kb(True))
                 return
 
+        # Если st есть, но режим не сработал — неизвестный запрос
+        unknown(peer_id)
+
     # ----- Главный цикл -----
     print("Бот запущен (фоновый поток)")
     while True:
@@ -350,9 +375,6 @@ def run_bot():
             for event in longpoll.listen():
                 if event.type != VkEventType.MESSAGE_NEW:
                     continue
-
-                # Принимаем сообщения только в ЛС (не в беседах)
-                # peer_id == user_id — это ЛС сообщества
                 if event.peer_id != event.user_id:
                     continue
 

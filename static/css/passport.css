@@ -1,62 +1,216 @@
 .passport-card {
-    max-width: 700px;
-    margin: 0 auto var(--space-xl);
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-xl) var(--space-lg);
-    box-shadow: var(--shadow-lg);
+	max-width: 700px;
+	margin: 0 auto var(--space-xl);
+	background: var(--bg-soft);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: var(--space-xl) var(--space-lg);
+	box-shadow: var(--shadow-lg);
 }
 
 .passport-header {
-    text-align: center;
-    padding-bottom: var(--space-md);
-    border-bottom: 2px solid var(--accent);
-    margin-bottom: var(--space-lg);
+	text-align: center;
+	padding-bottom: var(--space-md);
+	border-bottom: 2px solid var(--accent);
+	margin-bottom: var(--space-lg);
 }
 
 .passport-header h2 {
-    font-family: var(--font-serif);
-    font-size: 2rem;
-    letter-spacing: 4px;
-    margin: 0 0 var(--space-xs);
-    color: var(--text);
-    border: none;
-    padding: 0;
+	font-family: var(--font-serif);
+	font-size: 2rem;
+	letter-spacing: 4px;
+	margin: 0 0 var(--space-xs);
+	border: none;
+	padding: 0;
 }
 
 .passport-header p {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    margin: 0;
+	color: var(--text-muted);
+	font-size: 0.95rem;
+	margin: 0;
 }
 
 .passport-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 15px;
 }
 
 .passport-table th,
 .passport-table td {
-    padding: var(--space-sm) var(--space-md);
-    border-bottom: 1px solid var(--border-soft);
-    text-align: left;
-    vertical-align: top;
+	padding: var(--space-sm) var(--space-md);
+	border-bottom: 1px solid var(--border-soft);
+	text-align: left;
+	vertical-align: top;
 }
 
 .passport-table th {
-    width: 40%;
-    color: var(--text-muted);
-    font-weight: 600;
-    background: var(--bg-soft-2);
+	width: 40%;
+	color: var(--text-muted);
+	font-weight: 600;
+	background: var(--bg-soft-2);
 }
 
 .passport-table code {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    background: var(--bg-soft-2);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-    word-break: break-all;
+	font-family: var(--font-mono);
+	font-size: 13px;
+	background: var(--bg-soft-2);
+	padding: 2px 6px;
+	border-radius: var(--radius-sm);
+	word-break: break-all;
+}
+
+.passport-footer {
+	margin-top: var(--space-lg);
+	padding-top: var(--space-md);
+	border-top: 1px solid var(--border-soft);
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.passport-footer p {
+	margin: 0 0 var(--space-xs);
+}
+
+/* ---------- Форма проверки паспорта ---------- */
+.uuid-form {
+	margin: var(--space-lg) 0;
+	padding: var(--space-lg);
+	background: var(--bg-soft);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius);
+}
+
+.uuid-form__label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: var(--space-sm);
+	color: var(--text);
+	font-family: var(--font-serif);
+}
+
+.uuid-form__row {
+	display: flex;
+	gap: var(--space-sm);
+	align-items: stretch;
+}
+
+.uuid-form__input {
+	flex: 1;
+	min-width: 0;
+	padding: 10px 14px;
+	font-family: var(--font-mono);
+	font-size: 14px;
+	color: var(--text);
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.uuid-form__input::placeholder {
+	color: var(--text-soft);
+	opacity: 0.6;
+}
+
+.uuid-form__input:focus {
+	outline: none;
+	border-color: var(--accent);
+	box-shadow: 0 0 0 3px var(--bg-accent);
+}
+
+.uuid-form__input--error {
+	border-color: #dc2626;
+	box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.uuid-form__button {
+	padding: 10px 24px;
+	font-family: var(--font-sans);
+	font-size: 14px;
+	font-weight: 600;
+	color: #fff;
+	background: var(--accent);
+	border: 1px solid var(--accent);
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.1s ease;
+	white-space: nowrap;
+}
+
+.uuid-form__button:hover {
+	background: var(--link-hover);
+	border-color: var(--link-hover);
+}
+
+.uuid-form__button:active {
+	transform: translateY(1px);
+}
+
+.uuid-form__button:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+.uuid-form__hint {
+	margin: var(--space-sm) 0 0;
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.uuid-form__hint code {
+	font-size: 12px;
+}
+
+@media (max-width: 600px) {
+	.uuid-form__row {
+		flex-direction: column;
+	}
+
+	.uuid-form__button {
+		width: 100%;
+	}
+}
+
+/* ---------- Кнопка CTA ---------- */
+.passport-cta {
+	margin: var(--space-lg) 0;
+	text-align: center;
+}
+
+.btn {
+	display: inline-block;
+	padding: 12px 28px;
+	font-family: var(--font-sans);
+	font-size: 15px;
+	font-weight: 600;
+	text-decoration: none;
+	border-radius: var(--radius);
+	border: 1px solid transparent;
+	transition: background 0.15s ease, color 0.15s ease,
+	            border-color 0.15s ease, transform 0.1s ease;
+	cursor: pointer;
+}
+
+.btn-primary {
+	background: var(--accent);
+	color: #fff;
+	border-color: var(--accent);
+}
+
+.btn-primary:hover {
+	background: var(--link-hover);
+	border-color: var(--link-hover);
+	color: #fff;
+	transform: translateY(-1px);
+}
+
+.btn-primary:active {
+	transform: translateY(0);
+}
+
+.btn-primary:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
 }

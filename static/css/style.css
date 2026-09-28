@@ -1000,3 +1000,40 @@ sup.reference a {
 		background: var(--bg-soft);
 	}
 }
+
+/* ---------- Нумерованный список шагов ---------- */
+.page-list-numbered {
+	counter-reset: step-counter;
+	list-style: none;
+	padding: 0;
+	margin: var(--space-lg) 0;
+}
+
+.page-list-numbered li {
+	counter-increment: step-counter;
+	position: relative;
+	padding: var(--space-md) var(--space-md) var(--space-md) 3.5em;
+	margin-bottom: var(--space-sm);
+	background: var(--bg-soft);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius);
+	line-height: 1.6;
+}
+
+.page-list-numbered li::before {
+	content: counter(step-counter);
+	position: absolute;
+	left: var(--space-md);
+	top: var(--space-md);
+	width: 2em;
+	height: 2em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--accent);
+	color: #fff;
+	font-weight: 700;
+	font-family: var(--font-sans);
+	border-radius: 50%;
+	line-height: 1;
+}
