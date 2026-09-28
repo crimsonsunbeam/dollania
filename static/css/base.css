@@ -61,6 +61,8 @@ body {
 	font-family: var(--font-sans);
 	font-size: 16px;
 	margin: 0;
+	display: flex;
+	flex-direction: column;
 	min-height: 100vh;
 	line-height: 1.65;
 	color: var(--text);
@@ -164,5 +166,353 @@ code {
 		--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
 		--shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
 		--shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+	}
+}
+
+/* ---------- Инфобокс ---------- */
+.infobox {
+	float: right;
+	clear: right;
+	width: var(--sidebar-width);
+	border: 1px solid var(--border);
+	background: var(--bg-soft);
+	font-size: 14px;
+	margin: 0 0 var(--space-lg) var(--sidebar-gap);
+	border-radius: var(--radius);
+	overflow: hidden;
+	box-shadow: var(--shadow-md);
+	line-height: 1.5;
+}
+
+.infobox-top {
+	background: linear-gradient(180deg, var(--dark) 0%, var(--dark-2) 100%);
+	text-align: center;
+}
+
+.infobox-above {
+	font-size: 0.8rem;
+	letter-spacing: 0.05em;
+	color: #b8bcc3;
+	padding: var(--space-sm) var(--space-md) 2px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.infobox-title {
+	font-family: var(--font-serif);
+	font-size: 1.3rem;
+	font-weight: 700;
+	color: #fff;
+	padding: var(--space-sm) var(--space-md);
+}
+
+.infobox-subheader {
+	font-size: 0.8rem;
+	color: #d0d4da;
+	padding: 3px var(--space-md) var(--space-md);
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.infobox-image {
+	text-align: center;
+	padding: var(--space-md) 10px;
+	background: #fff;
+}
+
+.infobox-image img {
+	display: block;
+	margin: 0 auto var(--space-xs);
+	border-radius: var(--radius-sm);
+}
+
+.infobox-caption {
+	font-size: 12px;
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.infobox-table {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+.infobox-table th,
+.infobox-table td {
+	padding: var(--space-sm) var(--space-md);
+	text-align: left;
+	vertical-align: top;
+	border-top: 1px solid var(--border-soft);
+}
+
+.infobox-table th {
+	width: 45%;
+	font-weight: 600;
+	background: var(--bg-soft-2);
+}
+
+.infobox-table tr:nth-child(even) td {
+	background: var(--bg-soft);
+}
+
+.infobox-header-row th {
+	background: var(--dark-2);
+	color: #fff;
+	text-align: center;
+	font-family: var(--font-serif);
+	letter-spacing: 0.02em;
+	font-size: 13px;
+}
+
+/* ---------- TOC ---------- */
+.toc {
+	float: right;
+	clear: right;
+	width: var(--sidebar-width);
+	background: var(--bg-soft);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius);
+	padding: var(--space-md) var(--space-lg);
+	margin: 0 0 var(--space-md) var(--sidebar-gap);
+	box-shadow: var(--shadow-sm);
+	font-size: 14px;
+}
+
+.toc-title {
+	margin: 0 0 var(--space-md);
+	font-family: var(--font-serif);
+	font-size: 1rem;
+	font-weight: 700;
+	text-align: center;
+	padding-bottom: var(--space-sm);
+	border-bottom: 1px solid var(--border-soft);
+}
+
+.toc-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.toc-list li {
+	margin-bottom: var(--space-sm);
+}
+
+.toc-list a {
+	display: inline-block;
+	padding: 1px 2px;
+	color: var(--text);
+	border-bottom: none;
+	transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.toc-list a:hover {
+	color: var(--link-hover);
+	transform: translateX(3px);
+}
+
+/* ---------- Список разделов ---------- */
+.page-list {
+	list-style: none;
+	padding: 0;
+	margin: var(--space-lg) 0;
+}
+
+.page-list li {
+	padding: var(--space-md);
+	border-bottom: 1px solid var(--border-soft);
+}
+
+.page-list li:last-child {
+	border-bottom: none;
+}
+
+.page-list a {
+	font-weight: 600;
+	font-family: var(--font-serif);
+	font-size: 1.1em;
+	color: var(--link);
+}
+
+.page-list__hint {
+	display: block;
+	font-size: 0.9em;
+	color: var(--text-muted);
+	margin-top: 2px;
+}
+
+/* ---------- Список ссылок ---------- */
+.link-list {
+	list-style: none;
+	padding: 0;
+	margin: var(--space-lg) 0;
+}
+
+.link-list li {
+	padding: var(--space-sm) 0;
+	border-bottom: 1px solid var(--border-soft);
+}
+
+.link-list li:last-child {
+	border-bottom: none;
+}
+
+/* ---------- Hatnote ---------- */
+.hatnote {
+	font-style: italic;
+	color: var(--text-muted);
+	padding: var(--space-sm) var(--space-md);
+	margin: var(--space-md) 0 var(--space-lg);
+	background: var(--bg-soft);
+	border-left: 3px solid var(--border);
+	border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+	font-size: 0.95em;
+}
+
+.hatnote-icon {
+	margin-right: 6px;
+	color: var(--text-soft);
+}
+
+/* ---------- Lead ---------- */
+.lead {
+	font-size: 1.05em;
+	line-height: 1.7;
+}
+
+/* ---------- Ambos (сообщения) ---------- */
+.ambox {
+	margin: var(--space-lg) 0;
+	border: 1px solid var(--border);
+	border-left: 6px solid var(--accent);
+	background: var(--bg-soft);
+	padding: var(--space-md) var(--space-lg);
+	border-radius: var(--radius);
+	font-size: 0.95em;
+	display: flex;
+	gap: var(--space-md);
+	align-items: flex-start;
+	clear: both;
+}
+
+.ambox-icon {
+	font-size: 1.5em;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+.ambox-content {
+	flex: 1;
+}
+
+.ambox-content > :last-child {
+	margin-bottom: 0;
+}
+
+.ambox-notice { border-left-color: var(--accent); }
+.ambox-warning { border-left-color: #d97706; }
+.ambox-error   { border-left-color: #dc2626; }
+.ambox-success { border-left-color: #16a34a; }
+
+/* ---------- Catlinks ---------- */
+.catlinks {
+	margin-top: var(--space-xl);
+	padding: var(--space-md);
+	background: var(--bg-soft);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius);
+	font-size: 13px;
+	clear: both;
+}
+
+.catlinks-label {
+	font-weight: 600;
+	color: var(--text-muted);
+	margin-right: var(--space-sm);
+}
+
+.catlinks a {
+	display: inline-block;
+	padding: 2px 8px;
+	margin: 2px 2px;
+	background: var(--bg);
+	border: 1px solid var(--border-soft);
+	border-radius: 999px;
+	color: var(--link);
+	transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.catlinks a:hover {
+	background: var(--accent);
+	color: #fff;
+	border-color: var(--accent);
+}
+
+/* ---------- Thumb ---------- */
+.thumb {
+	margin: var(--space-md) 0;
+	padding: var(--space-sm);
+	background: var(--bg-soft);
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius);
+	font-size: 13px;
+}
+
+.thumb img {
+	display: block;
+	margin: 0 auto;
+	border-radius: var(--radius-sm);
+}
+
+.thumb figcaption {
+	margin-top: var(--space-sm);
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.thumb-right {
+	float: right;
+	clear: right;
+	width: 300px;
+	margin: 0 0 var(--space-md) var(--space-lg);
+}
+
+.thumb-left {
+	float: left;
+	clear: left;
+	width: 300px;
+	margin: 0 var(--space-lg) var(--space-md) 0;
+}
+
+/* ---------- Цитата ---------- */
+.quote {
+	margin: var(--space-lg) 0;
+	padding: var(--space-md) var(--space-lg);
+	border-left: 4px solid var(--accent);
+	background: var(--bg-accent);
+	font-family: var(--font-serif);
+	font-size: 1.05em;
+	font-style: italic;
+	border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.quote cite {
+	display: block;
+	margin-top: var(--space-sm);
+	font-style: normal;
+	font-size: 0.85em;
+	color: var(--text-muted);
+	text-align: right;
+}
+
+/* ---------- Адаптив ---------- */
+@media (max-width: 760px) {
+	.toc,
+	.infobox,
+	.thumb-right,
+	.thumb-left {
+		float: none;
+		clear: none;
+		width: 100%;
+		margin: 0 0 var(--space-lg) 0;
 	}
 }
