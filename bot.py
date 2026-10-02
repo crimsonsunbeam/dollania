@@ -1,6 +1,6 @@
 import os
-import uuid
 import time
+import uuid
 from datetime import datetime
 
 import vk_api
@@ -21,8 +21,15 @@ from db import (
 
 TOKEN = os.getenv("VK_TOKEN")
 
-PRESIDENT_RAW = os.getenv("PRESIDENT_ID", "1094812154")
-GROUP_RAW = os.getenv("GROUP_ID", "dollania")
+PRESIDENT_RAW = os.getenv(
+    "PRESIDENT_ID",
+    "1094812154"
+)
+
+GROUP_RAW = os.getenv(
+    "GROUP_ID",
+    "dollania"
+)
 
 BASE_URL = os.getenv(
     "BASE_URL",
@@ -31,10 +38,14 @@ BASE_URL = os.getenv(
 
 
 # ============================================================
-# ЗАПУСК
+# ЗАПУСК БОТА
 # ============================================================
 
 def run_bot():
+
+    # --------------------------------------------------------
+    # Проверка токена
+    # --------------------------------------------------------
 
     if not TOKEN:
         raise RuntimeError(
@@ -42,80 +53,141 @@ def run_bot():
         )
 
     # --------------------------------------------------------
-    # VK API
+    # Подключение VK
     # --------------------------------------------------------
 
-    vk_session = vk_api.VkApi(token=TOKEN)
+    print("[VK] Подключение...")
+
+    vk_session = vk_api.VkApi(
+        token=TOKEN
+    )
+
     vk = vk_session.get_api()
 
     # --------------------------------------------------------
-    # Получение ID пользователя/группы
+    # Resolve screen name
     # --------------------------------------------------------
 
     def resolve(screen_name):
+
         try:
+
             result = vk.utils.resolveScreenName(
                 screen_name=screen_name
             )
 
             if result and result.get("object_id"):
-                return int(result["object_id"])
+
+                return int(
+                    result["object_id"]
+                )
 
         except Exception as e:
-            print(f"[resolve] Ошибка: {e}")
+
+            print(
+                f"[RESOLVE] Ошибка: {e}"
+            )
 
         return None
 
-    # Президент
-    if str(PRESIDENT_RAW).isdigit():
-        PRESIDENT_ID = int(PRESIDENT_RAW)
-    else:
-        PRESIDENT_ID = resolve(PRESIDENT_RAW)
+    # --------------------------------------------------------
+    # PRESIDENT ID
+    # --------------------------------------------------------
 
-    # Группа
-    if str(GROUP_RAW).isdigit():
-        GROUP_ID = int(GROUP_RAW)
+    if str(PRESIDENT_RAW).isdigit():
+
+        PRESIDENT_ID = int(
+            PRESIDENT_RAW
+        )
+
     else:
-        GROUP_ID = resolve(GROUP_RAW)
+
+        PRESIDENT_ID = resolve(
+            PRESIDENT_RAW
+        )
+
+    # --------------------------------------------------------
+    # GROUP ID
+    # --------------------------------------------------------
+
+    if str(GROUP_RAW).isdigit():
+
+        GROUP_ID = int(
+            GROUP_RAW
+        )
+
+    else:
+
+        GROUP_ID = resolve(
+            GROUP_RAW
+        )
 
     if PRESIDENT_ID is None:
+
         raise RuntimeError(
-            f"Не удалось определить PRESIDENT_ID: {PRESIDENT_RAW}"
+            f"Не удалось определить "
+            f"PRESIDENT_ID: {PRESIDENT_RAW}"
         )
 
     if GROUP_ID is None:
+
         raise RuntimeError(
-            f"Не удалось определить GROUP_ID: {GROUP_RAW}"
+            f"Не удалось определить "
+            f"GROUP_ID: {GROUP_RAW}"
         )
 
     print(
-        f"[START] Президент={PRESIDENT_ID}, "
-        f"Группа={GROUP_ID}"
+        f"[START] Президент ID: {PRESIDENT_ID}"
     )
 
-    # --------------------------------------------------------
-    # Инициализация БД
-    # --------------------------------------------------------
+    print(
+        f"[START] Группа ID: {GROUP_ID}"
+    )
+
+    # ========================================================
+    # БАЗА ДАННЫХ
+    # ========================================================
 
     try:
+
         init_db()
-        print("[DB] База данных инициализирована")
+
+        print(
+            "[DB] База данных инициализирована"
+        )
+
     except Exception as e:
-        print(f"[DB] Ошибка инициализации: {e}")
+
+        print(
+            f"[DB] Ошибка: {e}"
+        )
+
         raise
 
-    # --------------------------------------------------------
-    # Состояния пользователей
-    # --------------------------------------------------------
+    # ========================================================
+    # СОСТОЯНИЯ ПОЛЬЗОВАТЕЛЕЙ
+    # ========================================================
 
     states = {}
 
     # ========================================================
-    # ОТПРАВКА СООБЩЕНИЙ
+    # ОБРАБОТАННЫЕ EVENT ID
     # ========================================================
 
-    def send(peer_id, text, keyboard=None):
+    processed_events = set()
+
+    # ========================================================
+    # ОТПРАВКА СООБЩЕНИЯ
+    # ========================================================
+
+    def send(
+        peer_id,
+        text,
+        keyboard=None
+    ):
+
         try:
+
             params = {
                 "peer_id": peer_id,
                 "message": text or " ",
@@ -123,67 +195,99 @@ def run_bot():
             }
 
             if keyboard is not None:
-                params["keyboard"] = keyboard.get_keyboard()
 
-            vk.messages.send(**params)
+                params["keyboard"] = (
+                    keyboard.get_keyboard()
+                )
+
+            vk.messages.send(
+                **params
+            )
 
             return True
 
         except Exception as e:
+
             print(
                 f"[SEND] Ошибка отправки "
                 f"peer_id={peer_id}: {e}"
             )
+
             return False
 
     # ========================================================
-    # АДМИНИСТРАТОРЫ
+    # ПОЛУЧЕНИЕ АДМИНИСТРАТОРОВ
     # ========================================================
 
     def get_admins():
-        admins = set()
+
+        ids = set()
+
+        allowed_roles = {
+            "administrator",
+            "creator",
+            "moderator",
+        }
 
         try:
+
             result = vk.groups.getMembers(
                 group_id=GROUP_ID,
                 filter="managers"
             )
 
-            managers = result.get("items", [])
-
-            allowed_roles = {
-                "administrator",
-                "creator",
-                "moderator",
-            }
+            managers = result.get(
+                "items",
+                []
+            )
 
             for manager in managers:
 
-                if isinstance(manager, dict):
-                    role = manager.get("role")
-                    user_id = manager.get("id")
+                if isinstance(
+                    manager,
+                    dict
+                ):
+
+                    user_id = manager.get(
+                        "id"
+                    )
+
+                    role = manager.get(
+                        "role"
+                    )
 
                     if (
                         user_id
                         and role in allowed_roles
                     ):
-                        admins.add(int(user_id))
+
+                        ids.add(
+                            int(user_id)
+                        )
 
                 else:
-                    admins.add(int(manager))
+
+                    ids.add(
+                        int(manager)
+                    )
 
         except Exception as e:
-            print(f"[ADMINS] Ошибка получения админов: {e}")
 
-        return list(admins)
+            print(
+                f"[ADMINS] Ошибка: {e}"
+            )
+
+        return list(ids)
 
     # ========================================================
-    # КЛАВИАТУРЫ
+    # ГЛАВНАЯ КЛАВИАТУРА
     # ========================================================
 
     def main_kb():
 
-        kb = VkKeyboard(one_time=False)
+        kb = VkKeyboard(
+            one_time=False
+        )
 
         kb.add_button(
             "Паспорт",
@@ -206,9 +310,15 @@ def run_bot():
 
         return kb
 
+    # ========================================================
+    # КЛАВИАТУРА ПАСПОРТА
+    # ========================================================
+
     def passport_kb(has_passport):
 
-        kb = VkKeyboard(one_time=False)
+        kb = VkKeyboard(
+            one_time=False
+        )
 
         if has_passport:
 
@@ -247,9 +357,15 @@ def run_bot():
 
         return kb
 
+    # ========================================================
+    # КНОПКА НАЗАД
+    # ========================================================
+
     def back_kb():
 
-        kb = VkKeyboard(one_time=False)
+        kb = VkKeyboard(
+            one_time=False
+        )
 
         kb.add_button(
             "Назад",
@@ -258,9 +374,15 @@ def run_bot():
 
         return kb
 
+    # ========================================================
+    # НЕИЗВЕСТНАЯ КОМАНДА
+    # ========================================================
+
     def unknown_kb():
 
-        kb = VkKeyboard(one_time=False)
+        kb = VkKeyboard(
+            one_time=False
+        )
 
         kb.add_button(
             "В меню",
@@ -270,28 +392,32 @@ def run_bot():
         return kb
 
     # ========================================================
-    # ПАСПОРТ
+    # ФОРМАТ ПАСПОРТА
     # ========================================================
 
     def format_passport(passport):
 
         url = (
             f"{BASE_URL.rstrip('/')}"
-            f"/passport/{passport['citizen_uuid']}"
+            f"/passport/"
+            f"{passport['citizen_uuid']}"
         )
 
         return (
-            "🪪 Паспорт\n\n"
+            "Паспорт\n\n"
             f"ФИО: {passport['full_name']}\n"
-            f"Дата рождения: {passport['birth_date']}\n"
-            f"UUID: {passport['citizen_uuid']}\n"
-            f"Дата выдачи: {passport['issue_date']}\n\n"
+            f"Дата рождения: "
+            f"{passport['birth_date']}\n"
+            f"UUID: "
+            f"{passport['citizen_uuid']}\n"
+            f"Дата выдачи: "
+            f"{passport['issue_date']}\n\n"
             "Открыть паспорт на сайте:\n"
             f"{url}"
         )
 
     # ========================================================
-    # НЕИЗВЕСТНАЯ КОМАНДА
+    # НЕИЗВЕСТНЫЙ ЗАПРОС
     # ========================================================
 
     def unknown(peer_id):
@@ -311,19 +437,63 @@ def run_bot():
     def valid_birth_date(value):
 
         try:
+
             date = datetime.strptime(
                 value,
                 "%d.%m.%Y"
             )
 
-            # Запрещаем явно невозможные даты
             if date > datetime.now():
+
                 return False
 
             return True
 
         except ValueError:
+
             return False
+
+    # ========================================================
+    # ПРОВЕРКА СОБЫТИЯ
+    # ========================================================
+
+    def is_own_message(event):
+
+        """
+        Проверяет, не является ли событие
+        сообщением, которое отправил сам бот.
+        """
+
+        # from_id — реальный отправитель сообщения
+        from_id = getattr(
+            event,
+            "from_id",
+            None
+        )
+
+        if from_id is None:
+
+            return False
+
+        try:
+
+            from_id = int(
+                from_id
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            return False
+
+        # Возможные варианты ID сообщества
+        # VK может отдавать отрицательный ID
+        return from_id in {
+            GROUP_ID,
+            -GROUP_ID
+        }
 
     # ========================================================
     # ОБРАБОТКА СООБЩЕНИЯ
@@ -331,42 +501,80 @@ def run_bot():
 
     def handle(event):
 
-        uid = int(event.user_id)
-        peer_id = int(event.peer_id)
+        # ----------------------------------------------------
+        # КРИТИЧЕСКАЯ ЗАЩИТА:
+        # НЕ ОБРАБАТЫВАЕМ СВОИ СООБЩЕНИЯ
+        # ----------------------------------------------------
 
-        text = (event.text or "").strip()
+        if is_own_message(event):
+
+            print(
+                "[IGNORE] Игнорируем "
+                "собственное сообщение бота"
+            )
+
+            return
+
+        # ----------------------------------------------------
+        # Данные сообщения
+        # ----------------------------------------------------
+
+        uid = int(
+            event.user_id
+        )
+
+        peer_id = int(
+            event.peer_id
+        )
+
+        text = (
+            event.text or ""
+        ).strip()
 
         print(
-            f"[MESSAGE] uid={uid}, "
-            f"peer={peer_id}, "
+            f"[MESSAGE] "
+            f"uid={uid} "
+            f"peer={peer_id} "
             f"text={text!r}"
         )
 
         # ----------------------------------------------------
-        # ВАЖНО:
-        # работаем только с личными сообщениями
+        # Только личные сообщения
         # ----------------------------------------------------
 
         if peer_id != uid:
+
+            print(
+                "[IGNORE] Сообщение "
+                "не из личного диалога"
+            )
+
             return
 
         # ----------------------------------------------------
-        # Паспорт
+        # Получение паспорта
         # ----------------------------------------------------
 
         try:
-            passport = get_passport(uid)
-        except Exception as e:
-            print(
-                f"[DB] Ошибка получения паспорта "
-                f"{uid}: {e}"
+
+            passport = get_passport(
+                uid
             )
+
+        except Exception as e:
+
+            print(
+                f"[DB] Ошибка получения "
+                f"паспорта: {e}"
+            )
+
             send(
                 peer_id,
                 "Произошла ошибка базы данных. "
                 "Попробуйте позже.",
                 main_kb()
             )
+
             return
 
         # ====================================================
@@ -375,7 +583,10 @@ def run_bot():
 
         if text == "В меню":
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             send(
                 peer_id,
@@ -397,18 +608,28 @@ def run_bot():
             "start",
         ):
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             send(
                 peer_id,
-                "Добро пожаловать в бот "
-                "виртуального государства Доллания!\n\n"
+
+                "Добро пожаловать "
+                "в бот виртуального "
+                "государства Доллания!\n\n"
+
                 "Здесь вы можете:\n"
                 "— получить паспорт гражданина;\n"
-                "— просмотреть и изменить данные паспорта;\n"
+                "— просмотреть и изменить "
+                "данные паспорта;\n"
                 "— написать Президенту;\n"
                 "— написать администраторам.\n\n"
-                "Выберите действие:",
+
+                "Выберите действие "
+                "в меню ниже.",
+
                 main_kb()
             )
 
@@ -418,9 +639,15 @@ def run_bot():
         # МЕНЮ
         # ====================================================
 
-        if text in ("Меню", "меню"):
+        if text in (
+            "Меню",
+            "меню"
+        ):
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             send(
                 peer_id,
@@ -436,13 +663,18 @@ def run_bot():
 
         if text == "Паспорт":
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             if passport:
 
                 send(
                     peer_id,
-                    format_passport(passport),
+                    format_passport(
+                        passport
+                    ),
                     passport_kb(True)
                 )
 
@@ -450,9 +682,12 @@ def run_bot():
 
                 send(
                     peer_id,
+
                     "Раздел «Паспорт».\n\n"
-                    "У вас пока нет паспорта.\n"
-                    "Нажмите «Зарегистрировать».",
+                    "У вас нет паспорта.\n"
+                    "Нажмите "
+                    "«Зарегистрировать».",
+
                     passport_kb(False)
                 )
 
@@ -492,7 +727,7 @@ def run_bot():
             return
 
         # ====================================================
-        # ИЗМЕНИТЬ ФИО
+        # ИЗМЕНЕНИЕ ФИО
         # ====================================================
 
         if text == "Изменить ФИО":
@@ -521,7 +756,7 @@ def run_bot():
             return
 
         # ====================================================
-        # ИЗМЕНИТЬ ДАТУ РОЖДЕНИЯ
+        # ИЗМЕНЕНИЕ ДАТЫ
         # ====================================================
 
         if text == "Изменить дату рождения":
@@ -551,7 +786,7 @@ def run_bot():
             return
 
         # ====================================================
-        # НАПИСАТЬ ПРЕЗИДЕНТУ
+        # ПРЕЗИДЕНТ
         # ====================================================
 
         if text in (
@@ -561,13 +796,18 @@ def run_bot():
 
             if uid == PRESIDENT_ID:
 
-                states.pop(uid, None)
+                states.pop(
+                    uid,
+                    None
+                )
 
                 send(
                     peer_id,
+
                     "Вы — Президент.\n\n"
                     "Вы не можете отправить "
                     "сообщение самому себе.",
+
                     main_kb()
                 )
 
@@ -579,15 +819,18 @@ def run_bot():
 
             send(
                 peer_id,
-                "Введите ваше сообщение Президенту.\n\n"
+
+                "Введите ваше сообщение "
+                "Президенту.\n\n"
                 "Разрешён только текст.",
+
                 back_kb()
             )
 
             return
 
         # ====================================================
-        # НАПИСАТЬ АДМИНИСТРАТОРАМ
+        # АДМИНИСТРАТОРЫ
         # ====================================================
 
         if text == "Написать администраторам":
@@ -598,9 +841,11 @@ def run_bot():
 
             send(
                 peer_id,
+
                 "Введите ваше сообщение "
                 "администраторам.\n\n"
                 "Разрешён только текст.",
+
                 back_kb()
             )
 
@@ -612,7 +857,10 @@ def run_bot():
 
         if text == "Назад":
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             send(
                 peer_id,
@@ -626,24 +874,35 @@ def run_bot():
         # FSM
         # ====================================================
 
-        state = states.get(uid)
+        state = states.get(
+            uid
+        )
 
+        # Нет активного состояния
         if not state:
 
-            unknown(peer_id)
+            unknown(
+                peer_id
+            )
+
             return
 
-        mode = state.get("mode")
+        mode = state.get(
+            "mode"
+        )
 
         # ====================================================
-        # PRESIDENT
+        # СООБЩЕНИЕ ПРЕЗИДЕНТУ
         # ====================================================
 
         if mode == "president":
 
             if uid == PRESIDENT_ID:
 
-                states.pop(uid, None)
+                states.pop(
+                    uid,
+                    None
+                )
 
                 send(
                     peer_id,
@@ -654,12 +913,17 @@ def run_bot():
 
                 return
 
-            # VK attachments
-            if getattr(event, "attachments", None):
+            # Запрещаем вложения
+            if getattr(
+                event,
+                "attachments",
+                None
+            ):
 
                 send(
                     peer_id,
-                    "Можно отправить только текст.\n"
+                    "Можно отправить "
+                    "только текст.\n\n"
                     "Напишите сообщение заново.",
                     back_kb()
                 )
@@ -670,24 +934,30 @@ def run_bot():
 
                 send(
                     peer_id,
-                    "Сообщение пустое.\n"
+                    "Сообщение пустое.\n\n"
                     "Введите текст:",
                     back_kb()
                 )
 
                 return
 
-            states.pop(uid, None)
+            # Сбрасываем состояние
+            states.pop(
+                uid,
+                None
+            )
 
             if passport:
 
                 info = (
                     "Гражданин\n"
-                    f"ФИО: {passport['full_name']}\n"
+                    f"ФИО: "
+                    f"{passport['full_name']}\n"
                     f"Страница: "
                     f"[vk.com/id{uid}|"
                     f"{passport['full_name']}]\n"
-                    f"UUID: {passport['citizen_uuid']}\n"
+                    f"UUID: "
+                    f"{passport['citizen_uuid']}\n"
                     f"Дата рождения: "
                     f"{passport['birth_date']}"
                 )
@@ -704,23 +974,22 @@ def run_bot():
                 )
 
             message = (
-                "📩 Новое сообщение от гражданина\n\n"
+                "Новое сообщение "
+                "от гражданина\n\n"
                 f"{info}\n\n"
                 "Сообщение:\n"
                 f"{text}"
             )
 
-            success = send(
+            if not send(
                 PRESIDENT_ID,
                 message
-            )
-
-            if not success:
+            ):
 
                 send(
                     peer_id,
-                    "Не удалось доставить сообщение "
-                    "Президенту.",
+                    "Не удалось доставить "
+                    "сообщение Президенту.",
                     main_kb()
                 )
 
@@ -728,24 +997,32 @@ def run_bot():
 
             send(
                 peer_id,
-                "Ваше сообщение отправлено Президенту.\n\n"
+
+                "Ваше сообщение "
+                "отправлено Президенту.\n\n"
                 "Ответ придёт в этом диалоге.",
+
                 main_kb()
             )
 
             return
 
         # ====================================================
-        # ADMINS
+        # СООБЩЕНИЕ АДМИНИСТРАТОРАМ
         # ====================================================
 
         if mode == "admins":
 
-            if getattr(event, "attachments", None):
+            if getattr(
+                event,
+                "attachments",
+                None
+            ):
 
                 send(
                     peer_id,
-                    "Можно отправить только текст.\n"
+                    "Можно отправить "
+                    "только текст.\n\n"
                     "Напишите сообщение заново.",
                     back_kb()
                 )
@@ -756,24 +1033,29 @@ def run_bot():
 
                 send(
                     peer_id,
-                    "Сообщение пустое.\n"
+                    "Сообщение пустое.\n\n"
                     "Введите текст:",
                     back_kb()
                 )
 
                 return
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             if passport:
 
                 info = (
                     "Отправитель\n"
-                    f"ФИО: {passport['full_name']}\n"
+                    f"ФИО: "
+                    f"{passport['full_name']}\n"
                     f"Страница: "
                     f"[vk.com/id{uid}|"
                     f"{passport['full_name']}]\n"
-                    f"UUID: {passport['citizen_uuid']}\n"
+                    f"UUID: "
+                    f"{passport['citizen_uuid']}\n"
                     f"Дата рождения: "
                     f"{passport['birth_date']}"
                 )
@@ -790,7 +1072,8 @@ def run_bot():
                 )
 
             message = (
-                "📩 Новое сообщение администраторам\n\n"
+                "Новое сообщение "
+                "администраторам\n\n"
                 f"{info}\n\n"
                 "Сообщение:\n"
                 f"{text}"
@@ -799,7 +1082,8 @@ def run_bot():
             admin_ids = get_admins()
 
             print(
-                f"[ADMINS] Найдено администраторов: "
+                f"[ADMINS] "
+                f"Администраторы: "
                 f"{admin_ids}"
             )
 
@@ -814,14 +1098,18 @@ def run_bot():
                     admin_id,
                     message
                 ):
+
                     delivered += 1
 
             if delivered == 0:
 
                 send(
                     peer_id,
-                    "Не удалось доставить сообщение "
-                    "ни одному администратору.",
+
+                    "Не удалось доставить "
+                    "сообщение ни одному "
+                    "администратору.",
+
                     main_kb()
                 )
 
@@ -829,22 +1117,30 @@ def run_bot():
 
             send(
                 peer_id,
+
                 "Ваше сообщение отправлено "
                 f"администраторам "
                 f"({delivered} получателей).\n\n"
                 "Ответ придёт в этом диалоге.",
+
                 main_kb()
             )
 
             return
 
         # ====================================================
-        # EDIT
+        # ИЗМЕНЕНИЕ ПАСПОРТА
         # ====================================================
 
         if mode == "edit":
 
-            field = state.get("field")
+            field = state.get(
+                "field"
+            )
+
+            # ------------------------------------------------
+            # ФИО
+            # ------------------------------------------------
 
             if field == "full_name":
 
@@ -852,22 +1148,32 @@ def run_bot():
 
                     send(
                         peer_id,
-                        "Слишком короткое ФИО.\n"
+                        "Слишком короткое ФИО.\n\n"
                         "Введите ещё раз:",
                         back_kb()
                     )
 
                     return
 
+            # ------------------------------------------------
+            # Дата рождения
+            # ------------------------------------------------
+
             elif field == "birth_date":
 
-                if not valid_birth_date(text):
+                if not valid_birth_date(
+                    text
+                ):
 
                     send(
                         peer_id,
-                        "Неверная дата.\n"
-                        "Введите дату в формате "
+
+                        "Неверный формат "
+                        "или дата.\n\n"
+                        "Введите дату "
+                        "в формате "
                         "ДД.ММ.ГГГГ:",
+
                         back_kb()
                     )
 
@@ -875,10 +1181,20 @@ def run_bot():
 
             else:
 
-                states.pop(uid, None)
+                states.pop(
+                    uid,
+                    None
+                )
 
-                unknown(peer_id)
+                unknown(
+                    peer_id
+                )
+
                 return
+
+            # ------------------------------------------------
+            # Обновляем
+            # ------------------------------------------------
 
             try:
 
@@ -891,33 +1207,48 @@ def run_bot():
             except Exception as e:
 
                 print(
-                    f"[DB] Ошибка обновления "
-                    f"{uid}: {e}"
+                    f"[DB] Ошибка обновления: "
+                    f"{e}"
                 )
 
-                states.pop(uid, None)
+                states.pop(
+                    uid,
+                    None
+                )
 
                 send(
                     peer_id,
-                    "Не удалось обновить паспорт.",
+                    "Не удалось обновить "
+                    "паспорт.",
                     main_kb()
                 )
 
                 return
 
-            states.pop(uid, None)
+            states.pop(
+                uid,
+                None
+            )
 
             try:
-                new_passport = get_passport(uid)
+
+                new_passport = get_passport(
+                    uid
+                )
+
             except Exception:
+
                 new_passport = None
 
             if not new_passport:
 
                 send(
                     peer_id,
+
                     "Данные обновлены, "
-                    "но паспорт не удалось получить.",
+                    "но паспорт не удалось "
+                    "получить.",
+
                     main_kb()
                 )
 
@@ -925,26 +1256,37 @@ def run_bot():
 
             send(
                 peer_id,
+
                 "Данные обновлены.\n\n"
-                + format_passport(new_passport),
+                + format_passport(
+                    new_passport
+                ),
+
                 passport_kb(True)
             )
 
             return
 
         # ====================================================
-        # CREATE
+        # СОЗДАНИЕ ПАСПОРТА
         # ====================================================
 
         if mode == "create":
 
-            # Защита от повторной регистрации
+            # ------------------------------------------------
+            # Повторная проверка
+            # ------------------------------------------------
+
             try:
-                existing = get_passport(uid)
+
+                existing = get_passport(
+                    uid
+                )
+
             except Exception as e:
 
                 print(
-                    f"[DB] Ошибка проверки паспорта: {e}"
+                    f"[DB] Ошибка: {e}"
                 )
 
                 send(
@@ -957,7 +1299,10 @@ def run_bot():
 
             if existing:
 
-                states.pop(uid, None)
+                states.pop(
+                    uid,
+                    None
+                )
 
                 send(
                     peer_id,
@@ -967,7 +1312,9 @@ def run_bot():
 
                 return
 
-            field = state.get("field")
+            field = state.get(
+                "field"
+            )
 
             # ------------------------------------------------
             # ФИО
@@ -979,52 +1326,69 @@ def run_bot():
 
                     send(
                         peer_id,
-                        "Слишком короткое ФИО.\n"
+
+                        "Слишком короткое ФИО.\n\n"
                         "Введите ещё раз:",
+
                         back_kb()
                     )
 
                     return
 
-                state["data"]["full_name"] = text
+                state["data"][
+                    "full_name"
+                ] = text
 
-                state["field"] = "birth_date"
+                state["field"] = (
+                    "birth_date"
+                )
 
                 send(
                     peer_id,
+
                     "Введите дату рождения "
                     "(ДД.ММ.ГГГГ):",
+
                     back_kb()
                 )
 
                 return
 
             # ------------------------------------------------
-            # Дата рождения
+            # ДАТА
             # ------------------------------------------------
 
             if field == "birth_date":
 
-                if not valid_birth_date(text):
+                if not valid_birth_date(
+                    text
+                ):
 
                     send(
                         peer_id,
-                        "Неверная дата.\n"
-                        "Введите дату в формате "
-                        "ДД.ММ.ГГГГ:",
+
+                        "Неверный формат "
+                        "или дата.\n\n"
+                        "Введите ДД.ММ.ГГГГ:",
+
                         back_kb()
                     )
 
                     return
 
-                state["data"]["birth_date"] = text
+                state["data"][
+                    "birth_date"
+                ] = text
 
+                # UUID паспорта
                 citizen_uuid = str(
                     uuid.uuid4()
                 )
 
-                issue_date = datetime.now().strftime(
-                    "%d.%m.%Y"
+                # Дата выдачи
+                issue_date = (
+                    datetime.now()
+                    .strftime("%d.%m.%Y")
                 )
 
                 try:
@@ -1033,42 +1397,61 @@ def run_bot():
                         uid,
                         citizen_uuid,
                         issue_date,
-                        state["data"]["full_name"],
-                        state["data"]["birth_date"]
+                        state["data"][
+                            "full_name"
+                        ],
+                        state["data"][
+                            "birth_date"
+                        ]
                     )
 
                 except Exception as e:
 
                     print(
-                        f"[DB] Ошибка создания паспорта: "
+                        f"[DB] Ошибка создания: "
                         f"{e}"
                     )
 
-                    states.pop(uid, None)
+                    states.pop(
+                        uid,
+                        None
+                    )
 
                     send(
                         peer_id,
-                        "Ошибка регистрации. "
+
+                        "Ошибка регистрации.\n"
                         "Попробуйте ещё раз.",
+
                         main_kb()
                     )
 
                     return
 
-                states.pop(uid, None)
+                states.pop(
+                    uid,
+                    None
+                )
 
                 try:
-                    new_passport = get_passport(uid)
+
+                    new_passport = (
+                        get_passport(uid)
+                    )
+
                 except Exception:
+
                     new_passport = None
 
                 if not new_passport:
 
                     send(
                         peer_id,
+
                         "Паспорт создан, "
                         "но произошла ошибка "
                         "при его получении.",
+
                         main_kb()
                     )
 
@@ -1076,64 +1459,162 @@ def run_bot():
 
                 send(
                     peer_id,
-                    "🎉 Паспорт выдан!\n\n"
-                    + format_passport(new_passport),
+
+                    "Паспорт выдан!\n\n"
+                    + format_passport(
+                        new_passport
+                    ),
+
                     passport_kb(True)
                 )
 
                 return
 
         # ====================================================
-        # ЕСЛИ СОСТОЯНИЕ НЕ ОБРАБОТАНО
+        # НЕИЗВЕСТНЫЙ РЕЖИМ
         # ====================================================
 
-        states.pop(uid, None)
+        states.pop(
+            uid,
+            None
+        )
 
-        unknown(peer_id)
+        unknown(
+            peer_id
+        )
 
     # ========================================================
     # LONG POLL
     # ========================================================
 
-    print("[BOT] Запуск Long Poll...")
+    print(
+        "[BOT] Запуск Long Poll..."
+    )
 
     while True:
 
         try:
 
-            # Создаём LongPoll заново только после
-            # реального обрыва соединения.
             longpoll = VkLongPoll(
                 vk_session,
                 wait=25
             )
 
-            print("[BOT] Бот запущен.")
-            print("[BOT] Ожидание сообщений...")
+            print(
+                "[BOT] Бот запущен."
+            )
+
+            print(
+                "[BOT] Ожидаю сообщения..."
+            )
+
+            # ------------------------------------------------
+            # Слушаем события
+            # ------------------------------------------------
 
             for event in longpoll.listen():
 
-                if event.type != VkEventType.MESSAGE_NEW:
+                # --------------------------------------------
+                # Только новые сообщения
+                # --------------------------------------------
+
+                if (
+                    event.type
+                    != VkEventType.MESSAGE_NEW
+                ):
+
                     continue
 
-                # Только личные сообщения.
-                if event.peer_id != event.user_id:
+                # --------------------------------------------
+                # Защита от повторной обработки
+                # --------------------------------------------
+
+                event_id = getattr(
+                    event,
+                    "event_id",
+                    None
+                )
+
+                if event_id is not None:
+
+                    if event_id in processed_events:
+
+                        print(
+                            "[IGNORE] Повторное "
+                            f"событие {event_id}"
+                        )
+
+                        continue
+
+                    processed_events.add(
+                        event_id
+                    )
+
+                    # ----------------------------------------
+                    # Ограничиваем размер set
+                    # ----------------------------------------
+
+                    if len(
+                        processed_events
+                    ) > 10000:
+
+                        processed_events.clear()
+
+                # --------------------------------------------
+                # Только личные сообщения
+                # --------------------------------------------
+
+                if (
+                    event.peer_id
+                    != event.user_id
+                ):
+
+                    print(
+                        "[IGNORE] Сообщение "
+                        "из беседы"
+                    )
+
                     continue
+
+                # --------------------------------------------
+                # Игнорируем собственные сообщения
+                # --------------------------------------------
+
+                if is_own_message(
+                    event
+                ):
+
+                    print(
+                        "[IGNORE] Собственное "
+                        "сообщение бота"
+                    )
+
+                    continue
+
+                # --------------------------------------------
+                # Обрабатываем сообщение
+                # --------------------------------------------
 
                 try:
 
-                    handle(event)
+                    handle(
+                        event
+                    )
 
                 except Exception as e:
 
                     print(
-                        "[HANDLE] Критическая ошибка:"
+                        "[HANDLE] Критическая "
+                        f"ошибка: {e}"
                     )
 
-                    print(e)
-
                     import traceback
+
                     traceback.print_exc()
+
+        # ====================================================
+        # ОСТАНОВКА
+        # ====================================================
 
         except KeyboardInterrupt:
 
@@ -1143,15 +1624,21 @@ def run_bot():
 
             break
 
+        # ====================================================
+        # ОШИБКА LONG POLL
+        # ====================================================
+
         except Exception as e:
 
             print(
-                f"[LONGPOLL] Соединение потеряно: "
+                "[LONGPOLL] Соединение "
+                f"оборвано: "
                 f"{type(e).__name__}: {e}"
             )
 
             print(
-                "[LONGPOLL] Повторное подключение "
+                "[LONGPOLL] "
+                "Переподключение "
                 "через 5 секунд..."
             )
 
@@ -1163,4 +1650,5 @@ def run_bot():
 # ============================================================
 
 if __name__ == "__main__":
+
     run_bot()
